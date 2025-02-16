@@ -26,7 +26,7 @@ A merchandise management system with virtual currency transactions, built with G
 
 1. Clone the repository:
    ```
-   git clone https://github.com/Rastler3D/merch_shop.git
+   git clone https://github.com/VIXI1703/merch_shop.git
    cd merch_shop
    ```
 
