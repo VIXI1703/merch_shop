@@ -20,7 +20,7 @@ const (
 )
 
 func setupTestDB(t *testing.T) *gorm.DB {
-	dbConn, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	dbConn, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{SkipDefaultTransaction: true})
 	assert.NoError(t, err)
 
 	db.InitDB(dbConn)

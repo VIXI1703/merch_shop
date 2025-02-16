@@ -1,4 +1,13 @@
-FROM ubuntu:latest
-LABEL authors="hvalo"
+FROM golang:1.23-alpine
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY ./ ./
+
+RUN go build -o main ./cmd/merch_shop
+
+CMD ["./main"]

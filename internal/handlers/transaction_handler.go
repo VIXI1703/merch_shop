@@ -8,9 +8,9 @@ import (
 )
 
 type transactionService interface {
-	getInfo(userId int) (model.InfoResponse, error)
-	sendCoins(userId int, toUser string, amount int) error
-	buyItem(userId int, name string) error
+	GetInfo(userId uint) (model.InfoResponse, error)
+	SendCoin(userId uint, toUser string, amount uint) error
+	BuyItem(userId uint, name string) error
 }
 
 type TransactionHandler struct {
@@ -23,13 +23,13 @@ func NewTransactionHandler(infoService transactionService) *TransactionHandler {
 
 func (handler *TransactionHandler) Routes(c *gin.RouterGroup) {
 	c.GET("/info", handler.GetInfo)
-	c.GET("/sendCoins", handler.SendCoins)
+	c.POST("/sendCoin", handler.SendCoin)
 	c.GET("/buy/:item", handler.BuyItem)
 }
 
 func (h TransactionHandler) GetInfo(c *gin.Context) {
 	claims, _ := middleware.GetUser(c)
-	response, err := h.transactionService.getInfo(claims.UserId)
+	response, err := h.transactionService.GetInfo(claims.UserId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{err.Error()})
 		return
@@ -37,7 +37,7 @@ func (h TransactionHandler) GetInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h TransactionHandler) SendCoins(c *gin.Context) {
+func (h TransactionHandler) SendCoin(c *gin.Context) {
 	var request model.SendCoinRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{"Required fields are empty or not valid"})
@@ -45,7 +45,7 @@ func (h TransactionHandler) SendCoins(c *gin.Context) {
 	}
 
 	claims, _ := middleware.GetUser(c)
-	err := h.transactionService.sendCoins(claims.UserId, request.ToUser, request.Amount)
+	err := h.transactionService.SendCoin(claims.UserId, request.ToUser, request.Amount)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{err.Error()})
 		return
@@ -55,8 +55,12 @@ func (h TransactionHandler) SendCoins(c *gin.Context) {
 
 func (h TransactionHandler) BuyItem(c *gin.Context) {
 	item := c.Param("item")
+	if item == "" {
+		c.JSON(http.StatusBadRequest, model.ErrorResponse{"item name is not provided"})
+		return
+	}
 	claims, _ := middleware.GetUser(c)
-	err := h.transactionService.buyItem(claims.UserId, item)
+	err := h.transactionService.BuyItem(claims.UserId, item)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{err.Error()})
 		return

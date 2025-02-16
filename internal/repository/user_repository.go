@@ -6,17 +6,17 @@ import (
 	"merch_shop/internal/entity"
 )
 
-type UserRepository struct {
+type GormUserRepository struct {
 	db *gorm.DB
 }
 
-func NewAuthRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{
+func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
+	return &GormUserRepository{
 		db: db,
 	}
 }
 
-func (repo *UserRepository) FindUserById(userId uint) (*entity.User, error) {
+func (repo *GormUserRepository) FindUserById(userId uint) (*entity.User, error) {
 	user := new(entity.User)
 	err := repo.db.First(user, userId).Error
 
@@ -29,7 +29,7 @@ func (repo *UserRepository) FindUserById(userId uint) (*entity.User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) FindUserByName(name string) (*entity.User, error) {
+func (repo *GormUserRepository) FindUserByName(name string) (*entity.User, error) {
 	user := new(entity.User)
 	err := repo.db.Where("name = ?", name).First(user).Error
 
@@ -42,6 +42,10 @@ func (repo *UserRepository) FindUserByName(name string) (*entity.User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) CreateUser(user *entity.User) error {
+func (repo *GormUserRepository) UpdateUser(user *entity.User) error {
+	return repo.db.Save(user).Error
+}
+
+func (repo *GormUserRepository) CreateUser(user *entity.User) error {
 	return repo.db.Create(user).Error
 }
